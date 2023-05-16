@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "classy"
+version = "0.0.1"
+description = "Yet another simple dataclass-like object for python."
+authors = ["백세종 <sejong418@icloud.com>"]
+license = "MIT license"
+readme = "README.md"
+packages = [{include = "classy", from = "classy"}]
+
+[tool.poetry.dependencies]
+python = "~3.11"
+orjson = "^3.8.8"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+pytest = "^7.2.2"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.0.0"
+mypy = "^1.1.1"
+yappi = "^1.4.0"
+pylint = "^2.17.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

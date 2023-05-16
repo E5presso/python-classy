@@ -1,2 +1,2 @@
 # Classy
-Yet another simple dataclass-like object for python.
+Yet another simplest dataclass-like object for python.
