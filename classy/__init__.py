@@ -59,11 +59,15 @@ class Classy(ABC):
                 item_types: tuple[Any, ...] = get_args(__type)
                 if collection_type == list:
                     if len(item_types) != 1:
-                        raise TypeError("Invalid generic type args.")
+                        raise TypeError(
+                            "Invalid generic item type args for 'list'."
+                        )
                     return [__decode_nested(item_types[0], x) for x in __value]
                 if collection_type == tuple:
                     if len(item_types) != len(__value):
-                        raise TypeError("Invalid generic type args.")
+                        raise TypeError(
+                            "Invalid generic item type args for 'tuple'. number of item args mismatched."
+                        )
                     return tuple(
                         [
                             __decode_nested(item_types[i], x)
@@ -72,7 +76,9 @@ class Classy(ABC):
                     )
                 if collection_type == dict:
                     if len(item_types) != 2:
-                        raise TypeError("Invalid generic type args.")
+                        raise TypeError(
+                            "Invalid generic type args for 'dict'."
+                        )
                     return {
                         x: __decode_nested(item_types[1], y)
                         for x, y in __value.items()

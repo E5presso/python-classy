@@ -262,3 +262,66 @@ def test_classy_object_generate_default() -> None:
         students_dict={},
         random_things=("", 0, Student.default()),
     )
+
+
+def test_wrong_type_hint() -> None:
+    @immutable
+    class Student(Classy):
+        name: str
+
+        def __eq__(self, __o: object) -> bool:
+            if not isinstance(__o, Student):
+                return False
+            return self.name == __o.name
+
+    @immutable
+    class Class(Classy):
+        name: str
+        student: Student
+        students_list: list[str, Student]  # type: ignore
+        students_dict: dict[str, Student]
+        random_things: tuple[str, int, Student]
+
+        def __eq__(self, __o: object) -> bool:
+            if not isinstance(__o, Class):
+                return False
+            return (
+                self.name == __o.name
+                and self.student == __o.student
+                and self.students_list == __o.students_list
+                and self.students_dict == __o.students_dict
+                and self.random_things == __o.random_things
+            )
+
+    with pytest.raises(TypeError):
+        assert Class.from_dict(
+            {
+                "name": "Software Engineering",
+                "student": {"name": "Sarah"},
+                "students_list": [
+                    {"name": "John"},
+                    {"name": "Sarah"},
+                    {"name": "Michael"},
+                ],
+                "students_dict": {
+                    "John": {"name": "John"},
+                    "Sarah": {"name": "Sarah"},
+                    "Michael": {"name": "Michael"},
+                },
+                "random_things": ("random", 0, {"name": "John"}),
+            }
+        ) == Class(
+            name="Software Engineering",
+            student=Student(name="Sarah"),
+            students_list=[
+                Student(name="John"),
+                Student(name="Sarah"),
+                Student(name="Michael"),
+            ],  # type: ignore
+            students_dict={
+                "John": Student(name="John"),
+                "Sarah": Student(name="Sarah"),
+                "Michael": Student(name="Michael"),
+            },
+            random_things=("random", 0, Student(name="John")),
+        )
