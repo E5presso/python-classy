@@ -10,15 +10,19 @@ from .mutability import mutable, immutable
 
 
 class Classy(ABC):
-    def __post_init__(self) -> None:
-        class_name: str = type(self).__name__
+    def __new__(cls: type[Self], *args, **kwargs) -> Self:
+        class_name: str = cls.__name__
         if not (
-            hasattr(self, f"_{class_name}__mutable_object")
-            or hasattr(self, f"_{class_name}__immutable_object")
+            hasattr(cls, f"_{class_name}__mutable_object")
+            or hasattr(cls, f"_{class_name}__immutable_object")
         ):
             raise TypeError(
-                f"'{class_name}' not decorated with mutabillity decorator. Domain Object has to decorated with @mutable or @immutable."
+                f"'{class_name}' is not decorated with mutability decorator. Classy Object has to be decorated with @mutable or @immutable."
             )
+        this = super().__new__(cls)
+        cls.args: tuple[Any, ...] = args
+        cls.kwargs: dict[str, Any] = kwargs
+        return this
 
     @property
     def dict(self: Any) -> dict[str, Any]:
@@ -33,8 +37,7 @@ class Classy(ABC):
     @property
     def json(self) -> str:
         def default(obj: Any) -> Any:
-            if isinstance(obj, set):
-                return list(obj)
+            return obj
 
         return orjson_dumps(self.dict, default=default)
 
@@ -45,38 +48,33 @@ class Classy(ABC):
 
     @classmethod
     def from_dict(cls: Type[Self], dictionary: Dict[str, Any]) -> Self:
-        def get_init_args(cls: Type[Self]) -> dict[str, Type[Any]]:
+        def __get_constructor_args(cls: Type[Self]) -> dict[str, Type[Any]]:
             argspec: FullArgSpec = getfullargspec(cls.__init__)
             args: dict[str, Type[Any]] = argspec.annotations
-            args.pop("return")
             return args
 
-        def decode(__type: Type, __value: Any) -> Any:
+        def __decode_nested(__type: Type, __value: Any) -> Any:
             if isinstance(__type, GenericAlias):
                 collection_type: type = __type.__origin__
                 item_types: tuple[Any, ...] = get_args(__type)
                 if collection_type == list:
                     if len(item_types) != 1:
                         raise TypeError("Invalid generic type args.")
-                    return [decode(item_types[0], x) for x in __value]
+                    return [__decode_nested(item_types[0], x) for x in __value]
                 if collection_type == tuple:
                     if len(item_types) != len(__value):
                         raise TypeError("Invalid generic type args.")
                     return tuple(
                         [
-                            decode(item_types[i], x)
+                            __decode_nested(item_types[i], x)
                             for i, x in enumerate(__value)
                         ]
                     )
-                if collection_type == set:
-                    if len(item_types) != 1:
-                        raise TypeError("Invalid generic type args.")
-                    return {decode(item_types[0], x) for x in __value}
                 if collection_type == dict:
                     if len(item_types) != 2:
                         raise TypeError("Invalid generic type args.")
                     return {
-                        x: decode(item_types[1], y)
+                        x: __decode_nested(item_types[1], y)
                         for x, y in __value.items()
                         if isinstance(x, item_types[0])
                     }
@@ -97,11 +95,11 @@ class Classy(ABC):
                 return time.fromisoformat(__value)
             return __value
 
-        init_args: dict[str, type] = get_init_args(cls)
+        init_args: dict[str, type] = __get_constructor_args(cls)
         arg_names: list[str] = list(init_args.keys())
         decoded: dict[str, Any] = dict(
             [
-                (k, decode(init_args[k], v))
+                (k, __decode_nested(init_args[k], v))
                 for k, v in dictionary.items()
                 if k in arg_names
             ]
@@ -126,8 +124,6 @@ class Classy(ABC):
                     if len(item_types) == 0:
                         return tuple()
                     return tuple([__default_nested(t) for t in item_types])
-                if collection_type == set:
-                    return collection_type()
                 if collection_type == dict:
                     return collection_type()
                 raise TypeError(
