@@ -4,12 +4,12 @@ from datetime import date, datetime, time
 from uuid import UUID, uuid4
 from types import GenericAlias
 from inspect import FullArgSpec, getfullargspec
-from typing import Any, Dict, Self, Type, final, get_args
-from .serializer import orjson_dumps, orjson_loads
+from typing import Any, Dict, Hashable, Self, Type, final, get_args
 from .mutability import mutable, immutable
+import json
 
 
-class Classy(ABC):
+class Classy(Hashable, ABC):
     def __new__(cls: type[Self], *args, **kwargs) -> Self:
         class_name: str = cls.__name__
         if not (
@@ -36,15 +36,11 @@ class Classy(ABC):
 
     @property
     def json(self) -> str:
-        def default(obj: Any) -> Any:
-            return obj
-
-        return orjson_dumps(self.dict, default=default)
+        return self.serialize(self.dict)
 
     @classmethod
-    def from_json(cls: Type[Self], json: str) -> Self:
-        dictionary: dict[str, Any] = orjson_loads(json)
-        return cls.from_dict(dictionary)
+    def from_json(cls: Type[Self], json_string: str) -> Self:
+        return cls.from_dict(cls.deserialize(json_string))
 
     @classmethod
     def from_dict(cls: Type[Self], dictionary: Dict[str, Any]) -> Self:
@@ -152,3 +148,33 @@ class Classy(ABC):
             [(k, __default_nested(t)) for k, t in init_args.items()]
         )
         return cls(**default_dict)
+
+    @final
+    def __eq__(self, __o: object) -> bool:
+        return self.equals(__o)
+
+    @final
+    def __ne__(self, __o: object) -> bool:
+        return not self.equals(__o)
+
+    @final
+    def __hash__(self) -> int:
+        return self.compute_hash()
+
+    def compute_hash(self) -> int:
+        return hash(self)
+
+    def equals(self, __o: object) -> bool:
+        raise NotImplementedError(
+            f"'{type(self).__name__}' does not implement equals(self, __o: object) -> bool."
+        )
+
+    def serialize(self, dictionary: Dict[str, Any]) -> str:
+        def default(obj: Any) -> Any:
+            return obj
+
+        return json.dumps(dictionary, default=default)
+
+    @classmethod
+    def deserialize(cls: Type[Self], json_string: str) -> Dict[str, Any]:
+        return json.loads(json_string)

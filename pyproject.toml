@@ -9,7 +9,6 @@ packages = [{include = "classy"}]
 
 [tool.poetry.dependencies]
 python = "~3.11"
-orjson = "^3.8.8"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"

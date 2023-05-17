@@ -25,17 +25,35 @@ def test_classy_object_with_not_mutability_decorator_raises_error() -> None:
     class WithoutDecorator(Classy):
         name: str
 
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
+            return super().equals(__o)
+
     class ButDefinesInit(Classy):
         name: str
 
         def __init__(self) -> None:
             ...
 
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
+            return super().equals(__o)
+
     class LooksLikeRightClass(Classy):
         name: str
 
         def __init__(self, name: str) -> None:
             self.name = name
+
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
+            return super().equals(__o)
 
     with pytest.raises(TypeError):
         w1: WithoutDecorator = WithoutDecorator()
@@ -63,10 +81,10 @@ def test_classy_object_from_to_dict() -> None:
     class Student(Classy):
         name: str
 
-        def __hash__(self) -> int:
+        def compute_hash(self) -> int:
             return hash(self.name)
 
-        def __eq__(self, __o: object) -> bool:
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Student):
                 return False
             return self.name == __o.name
@@ -79,7 +97,7 @@ def test_classy_object_from_to_dict() -> None:
         students_dict: dict[str, Student]
         random_things: tuple[str, int, Student]
 
-        def __hash__(self) -> int:
+        def compute_hash(self) -> int:
             return (
                 hash(self.name)
                 ^ hash(self.student)
@@ -87,7 +105,7 @@ def test_classy_object_from_to_dict() -> None:
                 ^ hash(self.random_things)
             )
 
-        def __eq__(self, __o: object) -> bool:
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Class):
                 return False
             return (
@@ -165,7 +183,10 @@ def test_classy_object_from_to_json() -> None:
     class Student(Classy):
         name: str
 
-        def __eq__(self, __o: object) -> bool:
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Student):
                 return False
             return self.name == __o.name
@@ -178,7 +199,10 @@ def test_classy_object_from_to_json() -> None:
         students_dict: dict[str, Student]
         random_things: tuple[str, int, Student]
 
-        def __eq__(self, __o: object) -> bool:
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Class):
                 return False
             return (
@@ -205,10 +229,10 @@ def test_classy_object_from_to_json() -> None:
             },
             random_things=("random", 0, Student(name="John")),
         ).json
-        == '{"name":"Software Engineering","student":{"name":"Sarah"},"students_list":[{"name":"John"},{"name":"Sarah"},{"name":"Michael"}],"students_dict":{"John":{"name":"John"},"Sarah":{"name":"Sarah"},"Michael":{"name":"Michael"}},"random_things":["random",0,{"name":"John"}]}'
+        == '{"name": "Software Engineering", "student": {"name": "Sarah"}, "students_list": [{"name": "John"}, {"name": "Sarah"}, {"name": "Michael"}], "students_dict": {"John": {"name": "John"}, "Sarah": {"name": "Sarah"}, "Michael": {"name": "Michael"}}, "random_things": ["random", 0, {"name": "John"}]}'
     )
     assert Class.from_json(
-        '{"name":"Software Engineering","student":{"name":"Sarah"},"students_list":[{"name":"John"},{"name":"Sarah"},{"name":"Michael"}],"students_dict":{"John":{"name":"John"},"Sarah":{"name":"Sarah"},"Michael":{"name":"Michael"}},"random_things":["random",0,{"name":"John"}]}'
+        '{"name": "Software Engineering", "student": {"name": "Sarah"}, "students_list": [{"name": "John"}, {"name": "Sarah"}, {"name": "Michael"}], "students_dict": {"John": {"name": "John"}, "Sarah": {"name": "Sarah"}, "Michael": {"name": "Michael"}}, "random_things": ["random", 0, {"name": "John"}]}'
     ) == Class(
         name="Software Engineering",
         student=Student(name="Sarah"),
@@ -231,7 +255,10 @@ def test_classy_object_generate_default() -> None:
     class Student(Classy):
         name: str
 
-        def __eq__(self, __o: object) -> bool:
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Student):
                 return False
             return self.name == __o.name
@@ -244,7 +271,10 @@ def test_classy_object_generate_default() -> None:
         students_dict: dict[str, Student]
         random_things: tuple[str, int, Student]
 
-        def __eq__(self, __o: object) -> bool:
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Class):
                 return False
             return (
@@ -269,7 +299,10 @@ def test_wrong_type_hint() -> None:
     class Student(Classy):
         name: str
 
-        def __eq__(self, __o: object) -> bool:
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Student):
                 return False
             return self.name == __o.name
@@ -282,7 +315,10 @@ def test_wrong_type_hint() -> None:
         students_dict: dict[str, Student]
         random_things: tuple[str, int, Student]
 
-        def __eq__(self, __o: object) -> bool:
+        def compute_hash(self) -> int:
+            return super().compute_hash()
+
+        def equals(self, __o: object) -> bool:
             if not isinstance(__o, Class):
                 return False
             return (
@@ -325,3 +361,24 @@ def test_wrong_type_hint() -> None:
             },
             random_things=("random", 0, Student(name="John")),
         )
+
+
+def test_non_equatable() -> None:
+    @mutable
+    class MutableClass(Classy):
+        name: str
+        age: int
+        job: str
+
+    a: MutableClass = MutableClass(
+        name="John",
+        age=29,
+        job="Doctor",
+    )
+    b: MutableClass = MutableClass(
+        name="John",
+        age=29,
+        job="Doctor",
+    )
+    with pytest.raises(NotImplementedError):
+        assert a == b
