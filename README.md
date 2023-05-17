@@ -3,7 +3,7 @@ Yet another simplest dataclass-like object for Python.
 
 <br>
 
-> ### **Classy** is a simplest dataclass with a several **restriction**.  
+## **Classy** is a simplest dataclass with a several **restriction**.  
 > 1. **Constructor** of Classy object only available with **keyword argument**.  
 > 2. Classy object is not *"Auto Hashable"* nor *"Auto Equatable"*. You have to implement *compute_hash(self)* or *equals(self, __o: object)* method on your own.  
 > 3. Classy object has to be decorated with **mutability decorator**. You need to set @mutable or @immutable decorator in your class definition.  
@@ -28,7 +28,7 @@ Yet another simplest dataclass-like object for Python.
 
 <br>
 
-> ### Why **Classy** has restriction?  
+## Why **Classy** has restriction?  
 > **Classy** is designed to develop domain models with minimum overhead.  
 > **Classy** is a just a wrapper for *dataclasses.dataclass* and uses *typing.dataclass_transform*  
 > Also, **Classy** is only uses pure python builtins, So you can keep your domain area safe from other dependencies.  
@@ -39,7 +39,7 @@ Yet another simplest dataclass-like object for Python.
 
 <br>
 
-> ### What **Classy** can actually do?
+## What **Classy** can actually do?
 > Pretty much nothing.  
 > But **Classy** has some features might useful for your project.  
 > 1. Classy has *.dict* or *.json* property to serialize.  
