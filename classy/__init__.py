@@ -162,7 +162,9 @@ class Classy(Hashable, ABC):
         return self.compute_hash()
 
     def compute_hash(self) -> int:
-        return hash(self)
+        raise NotImplementedError(
+            f"'{type(self).__name__}' does not implement compute_hash(self) -> int."
+        )
 
     def equals(self, __o: object) -> bool:
         raise NotImplementedError(
@@ -172,7 +174,7 @@ class Classy(Hashable, ABC):
     def serialize(self, dictionary: Dict[str, Any]) -> str:
         def default(obj: Any) -> Any:
             if isinstance(obj, UUID):
-                return obj.hex
+                return str(obj)
             return obj
 
         return json.dumps(dictionary, default=default)

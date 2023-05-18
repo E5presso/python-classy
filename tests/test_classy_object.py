@@ -480,3 +480,51 @@ def test_classy_eq_ne_hash() -> None:
 
     assert hash(t1) == hash(t2)
     assert hash(t1) != hash(t3)
+
+
+def test_decode_with_primitive_types() -> None:
+    @immutable
+    class Primitive(Classy):
+        name: str
+        age: int
+
+    from_dict: Primitive = Primitive.from_dict({"name": "John", "age": 29})
+    assert from_dict.name == "John"
+    assert from_dict.age == 29
+
+
+def test_default_with_empty_tuple() -> None:
+    @immutable
+    class EmptyTuples(Classy):
+        tuples: tuple
+
+    assert len(EmptyTuples.default().tuples) == 0
+
+
+def test_jsonify_object_with_uuid() -> None:
+    @immutable
+    class HasId(Classy):
+        id: UUID
+
+    id: UUID = uuid4()
+
+    assert HasId(id=id).json == f'{{"id": "{id}"}}'
+
+
+def test_default_with_unsupported_types() -> None:
+    @immutable
+    class UnsupportedTypes(Classy):
+        sets: set[str]
+
+    with pytest.raises(TypeError):
+        UnsupportedTypes.default()
+
+
+def test_default_hash() -> None:
+    @immutable
+    class DefaultHash(Classy):
+        name: str
+
+    d1: DefaultHash = DefaultHash(name="John")
+    with pytest.raises(NotImplementedError):
+        hash(d1)
