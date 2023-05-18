@@ -1,6 +1,6 @@
 # Python-Classy
 Yet another simplest dataclass-like object for Python.  
-[![codecov](https://codecov.io/gh/E5presso/Classy/branch/main/graph/badge.svg?token=F6WD2Y1976)](https://codecov.io/gh/E5presso/Classy)
+[![codecov](https://codecov.io/gh/E5presso/python-classy/branch/main/graph/badge.svg?token=F6WD2Y1976)](https://codecov.io/gh/E5presso/python-classy)
 <br>
 
 ## **Python-Classy** is a simplest dataclass with a several **restriction**.  
