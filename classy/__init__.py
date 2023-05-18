@@ -19,7 +19,7 @@ class Classy(Hashable, ABC):
             raise TypeError(
                 f"'{class_name}' is not decorated with mutability decorator. Classy Object has to be decorated with @mutable or @immutable."
             )
-        this = super().__new__(cls)
+        this: Self = super().__new__(cls)
         cls.args: tuple[Any, ...] = args
         cls.kwargs: dict[str, Any] = kwargs
         return this
