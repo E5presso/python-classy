@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-classy"
-version = "0.0.1"
+version = "0.0.2"
 description = "Yet another simple dataclass-like object for python."
 authors = ["백세종 <sejong418@icloud.com>"]
 license = "MIT license"
