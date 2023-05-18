@@ -29,13 +29,13 @@ Yet another simplest dataclass-like object for Python.
 <br>
 
 ## Why **Python-Classy** has restriction?  
-> **Python-Classy** is designed to develop domain models with minimum overhead.  
-> **Python-Classy** is a just a wrapper for *dataclasses.dataclass* and uses *typing.dataclass_transform*  
-> Also, **Python-Classy** is only uses pure python builtins, So you can keep your domain area safe from other dependencies.  
-> **Python-Classy** doesn't use metaclass to modify default type instantiator of your class. So It is truly pure **Plain Old Python Object**.  
-> I think **explicit** is better than **implicit**.  
-> So, **Python-Classy** restricts its own constructor to use **keyword argument only**. This may helps your project's coding convention.  
-> And also helps your teammate to prevent their **tiny mistake** (wrong placing argument's position)  
+> + **Python-Classy** is designed to develop domain models with minimum overhead.  
+> + **Python-Classy** is a just a wrapper for *dataclasses.dataclass* and uses *typing.dataclass_transform*  
+> + Also, **Python-Classy** is only uses pure python builtins, So you can keep your domain area safe from other dependencies.  
+> + **Python-Classy** doesn't use metaclass to modify default type instantiator of your class. So It is truly pure **Plain Old Python Object**.  
+> + I think **explicit** is better than **implicit**.  
+> + So, **Python-Classy** restricts its own constructor to use **keyword argument only**. This may helps your project's coding convention.  
+> + And also helps your teammate to prevent their **tiny mistake** (wrong placing argument's position)  
 
 <br>
 
