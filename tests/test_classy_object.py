@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import date, datetime, time
+from uuid import UUID, uuid4
 from classy import Classy, mutable, immutable
 import pytest
 
@@ -391,3 +392,91 @@ def test_decode_tuple_with_wrong_arg_length() -> None:
 
     with pytest.raises(TypeError):
         HaveTuple.from_dict({"tuples": (0, "", "", "")})
+
+
+def test_decode_dict_with_wrong_args() -> None:
+    @immutable
+    class WithDict(Classy):
+        dicts: dict[str, int, int]  # type: ignore
+
+    with pytest.raises(TypeError):
+        WithDict.from_dict({"dicts": {"key": 0}})
+
+
+def test_decode_with_unsupported_generic() -> None:
+    @immutable
+    class HasSet(Classy):
+        sets: set[str]
+
+    with pytest.raises(TypeError):
+        HasSet.from_dict({"sets": set(["a", "b", "c"])})
+
+
+def test_decode_with_various_supported_types() -> None:
+    @immutable
+    class HasSupportedTypes(Classy):
+        id: UUID
+        timestamp: datetime
+        only_date: date
+        only_time: time
+        string: str
+
+    id: UUID = uuid4()
+    timestamp: datetime = datetime.now()
+    only_date: date = date.today()
+    only_time: time = datetime.now().time()
+    string: str = "a"
+    assert HasSupportedTypes.from_dict(
+        {
+            "id": id.hex,
+            "timestamp": timestamp.isoformat(),
+            "only_date": only_date.isoformat(),
+            "only_time": only_time.isoformat(),
+            "string": string,
+        }
+    ).dict == {
+        "id": id,
+        "timestamp": timestamp,
+        "only_date": only_date,
+        "only_time": only_time,
+        "string": string,
+    }
+
+
+def test_default_with_tuples() -> None:
+    @immutable
+    class HasTuple(Classy):
+        tuples: tuple[str, str, int, UUID, datetime, date, time]
+
+    default: HasTuple = HasTuple.default()
+    assert len(default.tuples) == 7
+    assert default.tuples[0] == ""
+    assert default.tuples[1] == ""
+    assert default.tuples[2] == 0
+    assert isinstance(default.tuples[3], UUID)
+    assert isinstance(default.tuples[4], datetime)
+    assert isinstance(default.tuples[5], date)
+    assert isinstance(default.tuples[6], time)
+
+
+def test_classy_eq_ne_hash() -> None:
+    @immutable
+    class Test(Classy):
+        name: str
+
+        def equals(self, __o: object) -> bool:
+            if not isinstance(__o, Test):
+                return False
+            return self.name == __o.name
+
+        def compute_hash(self) -> int:
+            return hash(self.name)
+
+    t1: Test = Test(name="John")
+    t2: Test = Test(name="John")
+    t3: Test = Test(name="Sarah")
+    assert t1 == t2
+    assert t1 != t3
+
+    assert hash(t1) == hash(t2)
+    assert hash(t1) != hash(t3)

@@ -171,6 +171,8 @@ class Classy(Hashable, ABC):
 
     def serialize(self, dictionary: Dict[str, Any]) -> str:
         def default(obj: Any) -> Any:
+            if isinstance(obj, UUID):
+                return obj.hex
             return obj
 
         return json.dumps(dictionary, default=default)
