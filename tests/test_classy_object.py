@@ -382,3 +382,12 @@ def test_non_equatable() -> None:
     )
     with pytest.raises(NotImplementedError):
         assert a == b
+
+
+def test_decode_tuple_with_wrong_arg_length() -> None:
+    @immutable
+    class HaveTuple(Classy):
+        tuples: tuple[int, str, str]
+
+    with pytest.raises(TypeError):
+        HaveTuple.from_dict({"tuples": (0, "", "", "")})
