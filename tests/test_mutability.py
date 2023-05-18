@@ -1,5 +1,5 @@
 from dataclasses import FrozenInstanceError
-from classy import Classy, mutable, immutable
+from python_classy import Classy, mutable, immutable
 import pytest
 
 

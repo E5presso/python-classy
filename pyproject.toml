@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "classy"
+name = "python-classy"
 version = "0.0.1"
 description = "Yet another simple dataclass-like object for python."
 authors = ["백세종 <sejong418@icloud.com>"]
 license = "MIT license"
 readme = "README.md"
-packages = [{include = "classy"}]
+packages = [{include = "python_classy"}]
 
 [tool.poetry.dependencies]
 python = "~3.11"

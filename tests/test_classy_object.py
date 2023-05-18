@@ -1,6 +1,6 @@
 from datetime import date, datetime, time
 from uuid import UUID, uuid4
-from classy import Classy, mutable, immutable
+from python_classy import Classy, mutable, immutable
 import pytest
 
 
