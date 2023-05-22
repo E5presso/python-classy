@@ -8,7 +8,7 @@ Yet another simplest dataclass-like object for Python.
 > 2. Classy object is not *"Auto Hashable"* nor *"Auto Equatable"*. You have to implement *compute_hash(self)* or *equals(self, __o: object)* method on your own.  
 > 3. Classy object has to be decorated with **mutability decorator**. You need to set @mutable or @immutable decorator in your class definition.  
 > ```python
-> from classy import Classy, mutable, immutable
+> from python_classy import Classy, mutable, immutable
 >
 > @mutable  # You have to decorate with this when you want to keep this object mutable
 > class MutableClass(Classy):
